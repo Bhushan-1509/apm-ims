@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
+<x-partials.navbar/>
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-screen-md mx-auto bg-white rounded p-8 shadow-md">
         <h2 class="text-xl font-semibold mb-6">Company Information</h2>

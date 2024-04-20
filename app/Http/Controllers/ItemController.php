@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class CompanyController extends Controller
+class ItemController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-
+        //
     }
 
     /**
@@ -19,7 +19,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        return view('company.new-company');
+        return view('items.new-item');
     }
 
     /**
