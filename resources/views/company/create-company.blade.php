@@ -6,7 +6,6 @@
     <title>Tailwind CSS Form</title>
     <!-- Include Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100">
 <x-partials.navbar/>
@@ -53,25 +52,5 @@
         </form>
     </div>
 </div>
-
-@if ($success)
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '{{ $message }}',
-        });
-    </script>
-@endif
-@if (!$success)
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: '{{ $message }}',
-        });
-    </script>
-@endif
-
 </body>
 </html>
