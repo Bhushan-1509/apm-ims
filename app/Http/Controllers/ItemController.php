@@ -16,8 +16,52 @@ class ItemController extends Controller
      */
     public function index()
     {
-        $items = Item::all();
-        return view('items.item-table', ['items' => $items]);
+       if (request()->method() == 'GET')
+       {
+            $items = Item::all();
+            // SR NO.	COMPANY NAME	ITEM NAME	ITEM TYPE	RATE	EDIT	DELETE
+            $itemArray = array(
+            );
+            $companyList = [];
+            $data = array();
+            foreach($items as $item)
+            {   
+                $company = Company::find($item->company_id);
+                $cItem = json_decode($item['items'],true);
+                $itemDetails = $cItem['items'][0];
+                $companyName = $company->company_name;
+                $companyList[] = $companyName;
+                for($i = 0; $i < sizeof($itemDetails); $i++){
+                    $colon_position = strpos($itemDetails[$i], ":");
+                    $substring_before_colon = null;
+                    $substring_after_colon = null;
+                    if ($colon_position !== false) {
+                        $substring_before_colon = substr($itemDetails[$i], 0, $colon_position);
+                        $substring_before_colon = substr($substring_before_colon, 0, -2);
+                    }
+                    if (preg_match('/:(.*)/', $itemDetails[$i], $matches)) {
+                        $substring_after_colon = $matches[1];
+                        // Output: "xyz"
+                    } 
+                    $itemArray[$substring_before_colon] = $substring_after_colon;
+
+                }
+                $itemType = ItemType::find($itemArray['item_type'])->item_type;
+                $itemArray['company_name'] = $companyName;
+                $itemArray['item_type']   = $itemType;
+                $data[] = $itemArray;
+                // $itemsArray['']
+            }
+            // dd($data);
+            return view('items.item-table', ['items' => $data]);
+       }
+
+    }
+
+    public function deleteItem(){
+        $company = Company::where('company_name', request()->post('company_name_hidden'))->first();
+        dd($company->company_id);
+        $items = Item::where('company_id', $company->company_id)->first();
     }
 
     /**

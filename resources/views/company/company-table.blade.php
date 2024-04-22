@@ -121,8 +121,6 @@
             }
 
         });
-
-
         function confirmDelete(id) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -134,11 +132,10 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // If user confirms, submit the form
                     document.getElementById('deleteForm_' + id).submit();
                 }
-            });
-        }
+    });
+}
     </script>
 </body>
 </html>
