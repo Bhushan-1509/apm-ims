@@ -8,12 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.getElementById('reset').addEventListener('click', function(event) {
-            event.preventDefault();
-            window.location.href = "/company";
-        });
-    </script>
+
 </head>
 <body class="bg-gray-100">
     <x-partials.navbar/>
@@ -24,7 +19,7 @@
             <div class="flex items-center mb-4">
                 <input type="text" id="searchInput" name="search" class="form-input w-full px-4 py-2 border rounded-md mr-2 focus:outline-none focus:border-blue-500" placeholder="Search company...">
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Search</button>
-                <button type="reset" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 ml-2">Reset</button>
+                <button type="reset" id="reset" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 ml-2">Reset</button>
             </div>
         </form>
         <table class="min-w-full divide-y divide-gray-200">
@@ -39,32 +34,62 @@
             </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-            @foreach($companies as $company)
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $loop->index + 1 }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $company->company_name }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $company->company_type }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $company->address }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#queryDeleteModal">
-                            <i class="fa-solid fa-pen-nib"></i>
-                        </button>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <form action="{{ route('company.deleteCompanyInstance', $company->id) }}" method="post">
-                            @csrf
-                            <input type="hidden" name="company_id" value="{{ $company->id }}">
-{{--                            @method('DELETE')--}}
-                            <button type="submit" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#queryDeleteModal">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </form>
-                    </td>
+            @if(session('edited'))
+                @foreach($companies as $company)
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $loop->index + 1 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $company->company_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $company->company_type }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $company->address }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <input type="hidden" name="company_id_edit" value="{{ $company->id }}">
+                            <a type="button" class="btn btn-danger" href="{{ route('company.edit', $company->id) }}" data-bs-toggle="modal" data-bs-target="#queryDeleteModal">
+                                <i class="fa-solid fa-pen-nib"></i>
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <form action="{{ route('company.deleteCompanyInstance', $company->id) }}" method="post" id="deleteForm_{{ $company->id }}">
+                                @csrf
+                                <input type="hidden" name="company_id" value="{{ $company->id }}" >
+                                <button type="submit"  class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#queryDeleteModal">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
                     </tr>
-            @endforeach
+                @endforeach
+
+            @endif
+            @if(!session('edited'))
+                @foreach($companies as $company)
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $loop->index + 1 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $company->company_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $company->company_type }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $company->address }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <input type="hidden" name="company_id_edit" value="{{ $company->id }}">
+                            <a type="button" class="btn btn-danger" href="{{ route('company.edit', $company->id) }}" data-bs-toggle="modal" data-bs-target="#queryDeleteModal">
+                                <i class="fa-solid fa-pen-nib"></i>
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <form action="{{ route('company.deleteCompanyInstance', $company->id) }}" method="post">
+                                @csrf
+                                <input type="hidden" name="company_id" value="{{ $company->id }}">
+                                {{--                            @method('DELETE')--}}
+                                <button type="submit" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#queryDeleteModal"  onclick="confirmDelete({{ $company->id }})">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            @endif
             </tbody>
         </table>
     </div>
+
     @if(session('redirect'))
        @if (session('success'))
            <script>
@@ -75,7 +100,7 @@
                });
            </script>
        @endif
-       @if (! session('success'))
+       @if (!session('success'))
            <script>
                Swal.fire({
                    icon: 'error',
@@ -84,6 +109,36 @@
                });
            </script>
        @endif
-   @endif
+    @endif
+    <script>
+        document.getElementById('reset').addEventListener('click', function(event) {
+            event.preventDefault();
+            let currentUrl = window.location.href;
+
+            if (currentUrl.indexOf('?') !== -1) {
+                let baseUrl = currentUrl.split('?')[0];
+                window.location.href = baseUrl;
+            }
+
+        });
+
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If user confirms, submit the form
+                    document.getElementById('deleteForm_' + id).submit();
+                }
+            });
+        }
+    </script>
 </body>
 </html>

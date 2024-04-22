@@ -13,8 +13,10 @@ class CompanyController extends Controller
     public function index()
     {
         if(request()->query('search')){
-            $company = Company::query()->find(request()->query('search'));
-            dd($company);
+//            dd(request()->query('search'));
+            $companies = Company::query()->where('company_name','LIKE',request()->query('search'))->get();
+//            dd($companies);
+            return view('company.company-table', ['companies' => $companies])->with('redirect', false);
         }
         $companies = Company::all();
         return view('company.company-table', ['companies' => $companies])->with('redirect', false);
@@ -25,7 +27,11 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        return view('company.create-company')->with('redirect', false);
+        return view('company.create-company', ['company' => null])->with('redirect', false);
+    }
+
+    public function listCompanies(){
+        return array('companies' => Company::all()->jsonSerialize());
     }
 
     /**
@@ -38,11 +44,28 @@ class CompanyController extends Controller
             'address' => 'required|string',
             'company_type' => 'required|string',
         ]);
+//        dd($request->input('company_name'));
+        $existingCompany = Company::where([
+            ['company_name', '=', $validatedData['company_name']],
+            ['address', '=', $validatedData['address']],
+        ])->first();
+        if($existingCompany){
+            $result = $existingCompany->update($validatedData);
+            $data = [
+                'redirect' => true,
+                'success' => true,
+                'message' => 'Record updated successfully!',
+            ];
+
+
+//            return view('company.company-table', ['companies' => Company::all()])->with($data);
+            return redirect()->route('company.index')->with(['success' => true, 'message' => 'Record updated successfully !', 'redirect' => true, 'companies' => Company::all(), 'edited' => true]);
+
+        }
         $company = new Company();
         $company->company_name = $validatedData['company_name'];
         $company->address = $validatedData['address'];
         $company->company_type = $validatedData['company_type'];
-
         $company->save();
         if ($company->wasRecentlyCreated) {
             $data = [
@@ -60,6 +83,28 @@ class CompanyController extends Controller
             return view('company.new-company')->with($data);
 
         }
+    }
+
+    public function editCompany($id){
+        if (request()->method() == 'GET'){
+            $company = Company::find($id);
+            return view('company.create-company', ['company' => $company])->with('redirect', false);
+        }
+        else if (request()->method() == 'POST'){
+            $validatedData = request()->validate([
+                'company_name' => 'required|string',
+                'address' => 'required|string',
+                'company_type' => 'required|string',
+            ]);
+
+            $id = request()->input('company_id');
+            $company = Company::find($id);
+            dd($company);
+
+
+
+        }
+
     }
 
     public function search(Request $request){

@@ -28,14 +28,15 @@
         <form id="company-form" method="post" action="{{ route('company.store') }}">
             @csrf
             <!-- Company Name Input Field -->
+            <input type="hidden" name="company_id" value="{{ $company ? $company->id : '' }}">
             <div class="mb-4">
                 <label for="company-name" class="block text-gray-700 font-semibold mb-2">Company Name</label>
-                <input type="text" id="company-name" name="company_name" class="form-input w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500" placeholder="Enter company name">
+                <input type="text" id="company-name" value="{{ $company ? $company->company_name : '' }}" name="company_name" class="form-input w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500" placeholder="Enter company name">
             </div>
             <!-- Address Input Field -->
             <div class="mb-4">
                 <label for="address" class="block text-gray-700 font-semibold mb-2">Address</label>
-                <textarea id="address" name="address" rows="3" class="form-textarea w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500" placeholder="Enter address"></textarea>
+                <textarea id="address" name="address" rows="3" class="form-textarea w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500" placeholder="Enter address">{{ $company? $company->address : '' }}</textarea>
             </div>
             <!-- Company Type Dropdown -->
             <div class="mb-4">
